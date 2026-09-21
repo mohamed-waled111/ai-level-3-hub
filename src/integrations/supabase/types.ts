@@ -14,16 +14,427 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assessment_questions: {
+        Row: {
+          assessment_id: string
+          id: string
+          position: number
+          question_id: string
+        }
+        Insert: {
+          assessment_id: string
+          id?: string
+          position?: number
+          question_id: string
+        }
+        Update: {
+          assessment_id?: string
+          id?: string
+          position?: number
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_questions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assessment_questions_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessments: {
+        Row: {
+          created_at: string
+          description: string
+          difficulty: Database["public"]["Enums"]["difficulty"]
+          duration_minutes: number
+          id: string
+          kind: Database["public"]["Enums"]["assessment_kind"]
+          lecture_id: string
+          randomize: boolean
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          difficulty?: Database["public"]["Enums"]["difficulty"]
+          duration_minutes?: number
+          id?: string
+          kind?: Database["public"]["Enums"]["assessment_kind"]
+          lecture_id: string
+          randomize?: boolean
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          difficulty?: Database["public"]["Enums"]["difficulty"]
+          duration_minutes?: number
+          id?: string
+          kind?: Database["public"]["Enums"]["assessment_kind"]
+          lecture_id?: string
+          randomize?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessments_lecture_id_fkey"
+            columns: ["lecture_id"]
+            isOneToOne: false
+            referencedRelation: "lectures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attempt_answers: {
+        Row: {
+          answer: string | null
+          attempt_id: string
+          id: string
+          is_correct: boolean
+          position: number
+          question_id: string
+        }
+        Insert: {
+          answer?: string | null
+          attempt_id: string
+          id?: string
+          is_correct?: boolean
+          position?: number
+          question_id: string
+        }
+        Update: {
+          answer?: string | null
+          attempt_id?: string
+          id?: string
+          is_correct?: boolean
+          position?: number
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attempt_answers_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attempt_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attempts: {
+        Row: {
+          assessment_id: string
+          completed_at: string
+          correct: number
+          id: string
+          incorrect: number
+          mode: string
+          score_percent: number
+          time_used_seconds: number
+          total: number
+          unanswered: number
+          user_id: string
+        }
+        Insert: {
+          assessment_id: string
+          completed_at?: string
+          correct?: number
+          id?: string
+          incorrect?: number
+          mode?: string
+          score_percent?: number
+          time_used_seconds?: number
+          total?: number
+          unanswered?: number
+          user_id: string
+        }
+        Update: {
+          assessment_id?: string
+          completed_at?: string
+          correct?: number
+          id?: string
+          incorrect?: number
+          mode?: string
+          score_percent?: number
+          time_used_seconds?: number
+          total?: number
+          unanswered?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attempts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          accent: string
+          code: string
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          accent?: string
+          code: string
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          accent?: string
+          code?: string
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      lectures: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string
+          file_name: string | null
+          file_url: string | null
+          id: string
+          number: number
+          title: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          number?: number
+          title: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          number?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lectures_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          correct_answer: string
+          course_id: string
+          created_at: string
+          difficulty: Database["public"]["Enums"]["difficulty"]
+          explanation: string
+          id: string
+          image_url: string | null
+          lecture_id: string | null
+          options: Json
+          reference: string | null
+          text: string
+          type: Database["public"]["Enums"]["question_type"]
+        }
+        Insert: {
+          correct_answer: string
+          course_id: string
+          created_at?: string
+          difficulty?: Database["public"]["Enums"]["difficulty"]
+          explanation?: string
+          id?: string
+          image_url?: string | null
+          lecture_id?: string | null
+          options?: Json
+          reference?: string | null
+          text: string
+          type?: Database["public"]["Enums"]["question_type"]
+        }
+        Update: {
+          correct_answer?: string
+          course_id?: string
+          created_at?: string
+          difficulty?: Database["public"]["Enums"]["difficulty"]
+          explanation?: string
+          id?: string
+          image_url?: string | null
+          lecture_id?: string | null
+          options?: Json
+          reference?: string | null
+          text?: string
+          type?: Database["public"]["Enums"]["question_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questions_lecture_id_fkey"
+            columns: ["lecture_id"]
+            isOneToOne: false
+            referencedRelation: "lectures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      summaries: {
+        Row: {
+          content: string
+          id: string
+          lecture_id: string
+          published: boolean
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          id?: string
+          lecture_id: string
+          published?: boolean
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          id?: string
+          lecture_id?: string
+          published?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "summaries_lecture_id_fkey"
+            columns: ["lecture_id"]
+            isOneToOne: true
+            referencedRelation: "lectures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      summary_reads: {
+        Row: {
+          id: string
+          lecture_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          lecture_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          lecture_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "summary_reads_lecture_id_fkey"
+            columns: ["lecture_id"]
+            isOneToOne: false
+            referencedRelation: "lectures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "student"
+      assessment_kind: "quiz" | "exam"
+      difficulty: "easy" | "medium" | "hard"
+      question_type: "mcq" | "true_false"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +561,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "student"],
+      assessment_kind: ["quiz", "exam"],
+      difficulty: ["easy", "medium", "hard"],
+      question_type: ["mcq", "true_false"],
+    },
   },
 } as const
