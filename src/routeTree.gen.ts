@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as AssessAssessmentIdRouteImport } from './routes/assess.$assessmentId'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as LecturesLectureIdSummaryRouteImport } from './routes/lectures.$lectureId.summary'
@@ -23,6 +25,16 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssessAssessmentIdRoute = AssessAssessmentIdRouteImport.update({
+  id: '/assess/$assessmentId',
+  path: '/assess/$assessmentId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesIndexRoute = CoursesIndexRouteImport.update({
@@ -45,6 +57,8 @@ const LecturesLectureIdSummaryRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/progress': typeof ProgressRoute
+  '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses/': typeof CoursesIndexRoute
   '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRoute
@@ -52,6 +66,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/progress': typeof ProgressRoute
+  '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses': typeof CoursesIndexRoute
   '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRoute
@@ -60,6 +76,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/progress': typeof ProgressRoute
+  '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/courses/': typeof CoursesIndexRoute
   '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRoute
@@ -69,6 +87,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/progress'
+    | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/courses/'
     | '/lectures/$lectureId/summary'
@@ -76,6 +96,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/progress'
+    | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/courses'
     | '/lectures/$lectureId/summary'
@@ -83,6 +105,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/progress'
+    | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/courses/'
     | '/lectures/$lectureId/summary'
@@ -91,6 +115,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  ProgressRoute: typeof ProgressRoute
+  AssessAssessmentIdRoute: typeof AssessAssessmentIdRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   LecturesLectureIdSummaryRoute: typeof LecturesLectureIdSummaryRoute
@@ -110,6 +136,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assess/$assessmentId': {
+      id: '/assess/$assessmentId'
+      path: '/assess/$assessmentId'
+      fullPath: '/assess/$assessmentId'
+      preLoaderRoute: typeof AssessAssessmentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/courses/': {
@@ -139,6 +179,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  ProgressRoute: ProgressRoute,
+  AssessAssessmentIdRoute: AssessAssessmentIdRoute,
   CoursesCourseIdRoute: CoursesCourseIdRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   LecturesLectureIdSummaryRoute: LecturesLectureIdSummaryRoute,
