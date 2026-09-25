@@ -145,7 +145,11 @@ export function Breadcrumbs({ items }: { items: { label: string; to?: string; pa
         <span key={index} className="flex items-center gap-1.5">
           {index > 0 && <span className="text-border">/</span>}
           {item.to ? (
-            <Link to={item.to} params={item.params} className="transition-colors hover:text-foreground">
+            <Link
+              to={item.to}
+              {...(item.params ? { params: item.params } : {})}
+              className="transition-colors hover:text-foreground"
+            >
               {item.label}
             </Link>
           ) : (

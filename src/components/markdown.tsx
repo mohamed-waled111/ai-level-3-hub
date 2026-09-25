@@ -54,19 +54,20 @@ function inline(text: string): ReactNode[] {
 
 export function Markdown({ content, className = "" }: { content: string; className?: string }) {
   const lines = (content ?? "").replace(/\r\n/g, "\n").split("\n");
+  const at = (index: number): string => lines[index] ?? "";
   const blocks: ReactNode[] = [];
   let i = 0;
   let key = 0;
 
   while (i < lines.length) {
-    const line = lines[i];
+    const line = at(i);
 
     if (line.trim().startsWith("```")) {
       const lang = line.trim().slice(3);
       const buffer: string[] = [];
       i++;
-      while (i < lines.length && !lines[i].trim().startsWith("```")) {
-        buffer.push(lines[i]);
+      while (i < lines.length && !at(i).trim().startsWith("```")) {
+        buffer.push(at(i));
         i++;
       }
       i++;
@@ -91,8 +92,8 @@ export function Markdown({ content, className = "" }: { content: string; classNa
 
     const heading = /^(#{1,4})\s+(.*)$/.exec(line);
     if (heading) {
-      const level = heading[1].length;
-      const text = inline(heading[2]);
+      const level = (heading[1] ?? "#").length;
+      const text = inline(heading[2] ?? "");
       if (level === 1) blocks.push(<h1 key={key++}>{text}</h1>);
       else if (level === 2) blocks.push(<h2 key={key++}>{text}</h2>);
       else blocks.push(<h3 key={key++}>{text}</h3>);
@@ -102,8 +103,8 @@ export function Markdown({ content, className = "" }: { content: string; classNa
 
     if (line.trimStart().startsWith("> ")) {
       const buffer: string[] = [];
-      while (i < lines.length && lines[i].trimStart().startsWith("> ")) {
-        buffer.push(lines[i].trimStart().slice(2));
+      while (i < lines.length && at(i).trimStart().startsWith("> ")) {
+        buffer.push(at(i).trimStart().slice(2));
         i++;
       }
       blocks.push(<blockquote key={key++}>{inline(buffer.join(" "))}</blockquote>);
@@ -112,8 +113,8 @@ export function Markdown({ content, className = "" }: { content: string; classNa
 
     if (line.trimStart().startsWith("|") && line.includes("|", 1)) {
       const rows: string[][] = [];
-      while (i < lines.length && lines[i].trimStart().startsWith("|")) {
-        const cells = lines[i]
+      while (i < lines.length && at(i).trimStart().startsWith("|")) {
+        const cells = at(i)
           .trim()
           .replace(/^\|/, "")
           .replace(/\|$/, "")
@@ -122,7 +123,8 @@ export function Markdown({ content, className = "" }: { content: string; classNa
         if (!cells.every((c) => /^:?-{2,}:?$/.test(c))) rows.push(cells);
         i++;
       }
-      const [head, ...body] = rows;
+      const head = rows[0];
+      const body = rows.slice(1);
       blocks.push(
         <table key={key++}>
           {head && (
@@ -151,8 +153,8 @@ export function Markdown({ content, className = "" }: { content: string; classNa
     const bullet = /^\s*[-*+]\s+/;
     if (bullet.test(line)) {
       const items: string[] = [];
-      while (i < lines.length && bullet.test(lines[i])) {
-        items.push(lines[i].replace(bullet, ""));
+      while (i < lines.length && bullet.test(at(i))) {
+        items.push(at(i).replace(bullet, ""));
         i++;
       }
       blocks.push(
@@ -168,8 +170,8 @@ export function Markdown({ content, className = "" }: { content: string; classNa
     const numbered = /^\s*\d+[.)]\s+/;
     if (numbered.test(line)) {
       const items: string[] = [];
-      while (i < lines.length && numbered.test(lines[i])) {
-        items.push(lines[i].replace(numbered, ""));
+      while (i < lines.length && numbered.test(at(i))) {
+        items.push(at(i).replace(numbered, ""));
         i++;
       }
       blocks.push(
@@ -183,8 +185,12 @@ export function Markdown({ content, className = "" }: { content: string; classNa
     }
 
     const paragraph: string[] = [];
-    while (i < lines.length && lines[i].trim() !== "" && !/^(#{1,4}\s|\s*[-*+]\s|\s*\d+[.)]\s|>\s|\||```)/.test(lines[i])) {
-      paragraph.push(lines[i]);
+    while (
+      i < lines.length &&
+      at(i).trim() !== "" &&
+      !/^(#{1,4}\s|\s*[-*+]\s|\s*\d+[.)]\s|>\s|\||```)/.test(at(i))
+    ) {
+      paragraph.push(at(i));
       i++;
     }
     blocks.push(<p key={key++}>{inline(paragraph.join(" "))}</p>);

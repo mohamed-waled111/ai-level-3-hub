@@ -14,9 +14,11 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAssessmentsRouteImport } from './routes/admin.assessments'
 import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
 import { Route as AdminLecturesRouteImport } from './routes/admin.lectures'
 import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
+import { Route as AdminSummariesRouteImport } from './routes/admin.summaries'
 import { Route as AssessAssessmentIdRouteImport } from './routes/assess.$assessmentId'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
@@ -47,6 +49,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAssessmentsRoute = AdminAssessmentsRouteImport.update({
+  id: '/assessments',
+  path: '/assessments',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCoursesRoute = AdminCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
@@ -60,6 +67,11 @@ const AdminLecturesRoute = AdminLecturesRouteImport.update({
 const AdminQuestionsRoute = AdminQuestionsRouteImport.update({
   id: '/questions',
   path: '/questions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSummariesRoute = AdminSummariesRouteImport.update({
+  id: '/summaries',
+  path: '/summaries',
   getParentRoute: () => AdminRoute,
 } as any)
 const AssessAssessmentIdRoute = AssessAssessmentIdRouteImport.update({
@@ -89,9 +101,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/progress': typeof ProgressRoute
+  '/admin/assessments': typeof AdminAssessmentsRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/lectures': typeof AdminLecturesRoute
   '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/summaries': typeof AdminSummariesRoute
   '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -102,9 +116,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/progress': typeof ProgressRoute
+  '/admin/assessments': typeof AdminAssessmentsRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/lectures': typeof AdminLecturesRoute
   '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/summaries': typeof AdminSummariesRoute
   '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/admin': typeof AdminIndexRoute
@@ -117,9 +133,11 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/progress': typeof ProgressRoute
+  '/admin/assessments': typeof AdminAssessmentsRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/lectures': typeof AdminLecturesRoute
   '/admin/questions': typeof AdminQuestionsRoute
+  '/admin/summaries': typeof AdminSummariesRoute
   '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -133,9 +151,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/progress'
+    | '/admin/assessments'
     | '/admin/courses'
     | '/admin/lectures'
     | '/admin/questions'
+    | '/admin/summaries'
     | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/admin/'
@@ -146,9 +166,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/progress'
+    | '/admin/assessments'
     | '/admin/courses'
     | '/admin/lectures'
     | '/admin/questions'
+    | '/admin/summaries'
     | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/admin'
@@ -160,9 +182,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/progress'
+    | '/admin/assessments'
     | '/admin/courses'
     | '/admin/lectures'
     | '/admin/questions'
+    | '/admin/summaries'
     | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/admin/'
@@ -218,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/assessments': {
+      id: '/admin/assessments'
+      path: '/assessments'
+      fullPath: '/admin/assessments'
+      preLoaderRoute: typeof AdminAssessmentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/courses': {
       id: '/admin/courses'
       path: '/courses'
@@ -237,6 +268,13 @@ declare module '@tanstack/react-router' {
       path: '/questions'
       fullPath: '/admin/questions'
       preLoaderRoute: typeof AdminQuestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/summaries': {
+      id: '/admin/summaries'
+      path: '/summaries'
+      fullPath: '/admin/summaries'
+      preLoaderRoute: typeof AdminSummariesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/assess/$assessmentId': {
@@ -271,16 +309,20 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAssessmentsRoute: typeof AdminAssessmentsRoute
   AdminCoursesRoute: typeof AdminCoursesRoute
   AdminLecturesRoute: typeof AdminLecturesRoute
   AdminQuestionsRoute: typeof AdminQuestionsRoute
+  AdminSummariesRoute: typeof AdminSummariesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAssessmentsRoute: AdminAssessmentsRoute,
   AdminCoursesRoute: AdminCoursesRoute,
   AdminLecturesRoute: AdminLecturesRoute,
   AdminQuestionsRoute: AdminQuestionsRoute,
+  AdminSummariesRoute: AdminSummariesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
