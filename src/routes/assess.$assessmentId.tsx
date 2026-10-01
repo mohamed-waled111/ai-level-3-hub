@@ -33,7 +33,7 @@ export const Route = createFileRoute("/assess/$assessmentId")({
   errorComponent: ({ error }) => (
     <AppShell>
       <Container className="py-16">
-        <p role="alert">{error.message}</p>
+        <p role="alert">{error instanceof Error ? error.message : "The assessment could not be loaded."}</p>
       </Container>
     </AppShell>
   ),

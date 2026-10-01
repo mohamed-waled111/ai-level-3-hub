@@ -3,6 +3,7 @@ import type { Database } from "@/integrations/supabase/types";
 export type Course = Database["public"]["Tables"]["courses"]["Row"];
 export type Lecture = Database["public"]["Tables"]["lectures"]["Row"];
 export type Summary = Database["public"]["Tables"]["summaries"]["Row"];
+export type SummaryFile = Database["public"]["Tables"]["summary_files"]["Row"];
 export type Question = Database["public"]["Tables"]["questions"]["Row"];
 export type Assessment = Database["public"]["Tables"]["assessments"]["Row"];
 export type Attempt = Database["public"]["Tables"]["attempts"]["Row"];
