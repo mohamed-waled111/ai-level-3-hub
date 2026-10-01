@@ -32,7 +32,7 @@ export const Route = createFileRoute("/courses/$courseId")({
     <AppShell>
       <Container className="py-16">
         <p role="alert" className="text-sm text-destructive">
-          {error.message}
+          {error instanceof Error ? error.message : "The course could not be loaded."}
         </p>
       </Container>
     </AppShell>

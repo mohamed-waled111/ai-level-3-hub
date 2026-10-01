@@ -19,7 +19,7 @@ export const Route = createFileRoute("/lectures/$lectureId/summary")({
     { name: "twitter:card", content: "summary_large_image" },
   ] }),
   component: SummaryPage,
-  errorComponent: ({ error }) => <AppShell><Container className="py-16"><p role="alert">{error.message}</p></Container></AppShell>,
+  errorComponent: ({ error }) => <AppShell><Container className="py-16"><p role="alert">{error instanceof Error ? error.message : "The summary could not be loaded."}</p></Container></AppShell>,
   notFoundComponent: () => <AppShell><Container className="py-16"><p>Summary not found.</p></Container></AppShell>,
 });
 
