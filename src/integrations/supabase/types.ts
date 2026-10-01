@@ -370,6 +370,44 @@ export type Database = {
           },
         ]
       }
+      summary_files: {
+        Row: {
+          created_at: string
+          file_type: string
+          id: string
+          original_file_name: string
+          page_order: number
+          storage_path: string
+          summary_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_type: string
+          id?: string
+          original_file_name: string
+          page_order?: number
+          storage_path: string
+          summary_id: string
+        }
+        Update: {
+          created_at?: string
+          file_type?: string
+          id?: string
+          original_file_name?: string
+          page_order?: number
+          storage_path?: string
+          summary_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "summary_files_summary_id_fkey"
+            columns: ["summary_id"]
+            isOneToOne: false
+            referencedRelation: "summaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       summary_reads: {
         Row: {
           id: string
