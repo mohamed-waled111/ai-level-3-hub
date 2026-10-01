@@ -167,8 +167,8 @@ function CoursePage() {
 type LectureRowProps = {
   lecture: { id: string; number: number; title: string; description: string; file_url: string | null; file_name: string | null };
   courseCode: string;
-  quiz?: Assessment;
-  exam?: Assessment;
+  quiz?: Assessment | undefined;
+  exam?: Assessment | undefined;
   hasSummary: boolean;
   summaryRead: boolean;
   questionCounts: Record<string, number>;
@@ -294,8 +294,8 @@ function ResourceCard({
   meta: string[];
   done: boolean;
   actionLabel: string;
-  to?: { to: string; params: Record<string, string> };
-  disabledNote?: string;
+  to?: { to: string; params: Record<string, string> } | undefined;
+  disabledNote?: string | undefined;
 }) {
   return (
     <div className="card-surface flex flex-col p-5">
