@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, Expand, Minus, Plus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Expand, MessageSquareText, Minus, Plus } from "lucide-react";
 import { AppShell, Container, EmptyState } from "@/components/app-shell";
 import { Breadcrumbs } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
@@ -68,7 +68,18 @@ function SummaryPage() {
         <Breadcrumbs items={[{ label: "Courses", to: "/courses" }, ...(course ? [{ label: course.title, to: "/courses/$courseId", params: { courseId: course.id } }] : []), { label: `Lecture ${data?.lecture?.number ?? ""}` }, { label: "Summary" }]} />
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <div><p className="label-eyebrow">{course?.code} · Lecture {String(data?.lecture?.number ?? "").padStart(2, "0")}</p><h1 className="mt-1.5 text-3xl font-extrabold">{data?.lecture?.title ?? "Lecture summary"}</h1></div>
-          {course && <Button asChild variant="outline" size="sm"><Link to="/courses/$courseId" params={{ courseId: course.id }}><ArrowLeft className="size-4" /> Back to course</Link></Button>}
+          <div className="flex flex-wrap items-center gap-2">
+            {user && current && <Button asChild size="sm"><Link to="/lectures/$lectureId/summary/chat/$threadId" params={{ lectureId, threadId: "new" }} onClick={async (event) => {
+              event.preventDefault();
+              const existing = await supabase.from("summary_chat_threads").select("id").eq("lecture_id", lectureId).order("updated_at", { ascending: false }).limit(1).maybeSingle();
+              if (existing.data) window.location.assign(`/lectures/${lectureId}/summary/chat/${existing.data.id}`);
+              else {
+                const created = await supabase.from("summary_chat_threads").insert({ lecture_id: lectureId, user_id: user.id }).select("id").single();
+                if (created.data) window.location.assign(`/lectures/${lectureId}/summary/chat/${created.data.id}`);
+              }
+            }}><MessageSquareText className="size-4" /> Ask about this summary</Link></Button>}
+            {course && <Button asChild variant="outline" size="sm"><Link to="/courses/$courseId" params={{ courseId: course.id }}><ArrowLeft className="size-4" /> Back to course</Link></Button>}
+          </div>
         </div>
 
         <div className="mt-8">

@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep summary Q&A as database-backed, user-owned threads with server-side summary attachments, because private history and source-grounded answers must never rely on browser state.
