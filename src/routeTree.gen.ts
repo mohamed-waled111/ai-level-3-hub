@@ -19,10 +19,12 @@ import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
 import { Route as AdminLecturesRouteImport } from './routes/admin.lectures'
 import { Route as AdminQuestionsRouteImport } from './routes/admin.questions'
 import { Route as AdminSummariesRouteImport } from './routes/admin.summaries'
+import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AssessAssessmentIdRouteImport } from './routes/assess.$assessmentId'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as LecturesLectureIdSummaryRouteImport } from './routes/lectures.$lectureId.summary'
+import { Route as LecturesLectureIdSummaryChatThreadIdRouteImport } from './routes/lectures.$lectureId.summary.chat.$threadId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -74,6 +76,11 @@ const AdminSummariesRoute = AdminSummariesRouteImport.update({
   path: '/summaries',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AssessAssessmentIdRoute = AssessAssessmentIdRouteImport.update({
   id: '/assess/$assessmentId',
   path: '/assess/$assessmentId',
@@ -95,6 +102,12 @@ const LecturesLectureIdSummaryRoute =
     path: '/lectures/$lectureId/summary',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LecturesLectureIdSummaryChatThreadIdRoute =
+  LecturesLectureIdSummaryChatThreadIdRouteImport.update({
+    id: '/chat/$threadId',
+    path: '/chat/$threadId',
+    getParentRoute: () => LecturesLectureIdSummaryRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -106,11 +119,13 @@ export interface FileRoutesByFullPath {
   '/admin/lectures': typeof AdminLecturesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/summaries': typeof AdminSummariesRoute
+  '/api/chat': typeof ApiChatRoute
   '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/admin/': typeof AdminIndexRoute
   '/courses/': typeof CoursesIndexRoute
-  '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRoute
+  '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRouteWithChildren
+  '/lectures/$lectureId/summary/chat/$threadId': typeof LecturesLectureIdSummaryChatThreadIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -121,11 +136,13 @@ export interface FileRoutesByTo {
   '/admin/lectures': typeof AdminLecturesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/summaries': typeof AdminSummariesRoute
+  '/api/chat': typeof ApiChatRoute
   '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/admin': typeof AdminIndexRoute
   '/courses': typeof CoursesIndexRoute
-  '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRoute
+  '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRouteWithChildren
+  '/lectures/$lectureId/summary/chat/$threadId': typeof LecturesLectureIdSummaryChatThreadIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -138,11 +155,13 @@ export interface FileRoutesById {
   '/admin/lectures': typeof AdminLecturesRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/summaries': typeof AdminSummariesRoute
+  '/api/chat': typeof ApiChatRoute
   '/assess/$assessmentId': typeof AssessAssessmentIdRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/admin/': typeof AdminIndexRoute
   '/courses/': typeof CoursesIndexRoute
-  '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRoute
+  '/lectures/$lectureId/summary': typeof LecturesLectureIdSummaryRouteWithChildren
+  '/lectures/$lectureId/summary/chat/$threadId': typeof LecturesLectureIdSummaryChatThreadIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -156,11 +175,13 @@ export interface FileRouteTypes {
     | '/admin/lectures'
     | '/admin/questions'
     | '/admin/summaries'
+    | '/api/chat'
     | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/admin/'
     | '/courses/'
     | '/lectures/$lectureId/summary'
+    | '/lectures/$lectureId/summary/chat/$threadId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -171,11 +192,13 @@ export interface FileRouteTypes {
     | '/admin/lectures'
     | '/admin/questions'
     | '/admin/summaries'
+    | '/api/chat'
     | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/admin'
     | '/courses'
     | '/lectures/$lectureId/summary'
+    | '/lectures/$lectureId/summary/chat/$threadId'
   id:
     | '__root__'
     | '/'
@@ -187,11 +210,13 @@ export interface FileRouteTypes {
     | '/admin/lectures'
     | '/admin/questions'
     | '/admin/summaries'
+    | '/api/chat'
     | '/assess/$assessmentId'
     | '/courses/$courseId'
     | '/admin/'
     | '/courses/'
     | '/lectures/$lectureId/summary'
+    | '/lectures/$lectureId/summary/chat/$threadId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -199,10 +224,11 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ProgressRoute: typeof ProgressRoute
+  ApiChatRoute: typeof ApiChatRoute
   AssessAssessmentIdRoute: typeof AssessAssessmentIdRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
-  LecturesLectureIdSummaryRoute: typeof LecturesLectureIdSummaryRoute
+  LecturesLectureIdSummaryRoute: typeof LecturesLectureIdSummaryRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -277,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSummariesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/assess/$assessmentId': {
       id: '/assess/$assessmentId'
       path: '/assess/$assessmentId'
@@ -305,6 +338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LecturesLectureIdSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lectures/$lectureId/summary/chat/$threadId': {
+      id: '/lectures/$lectureId/summary/chat/$threadId'
+      path: '/chat/$threadId'
+      fullPath: '/lectures/$lectureId/summary/chat/$threadId'
+      preLoaderRoute: typeof LecturesLectureIdSummaryChatThreadIdRouteImport
+      parentRoute: typeof LecturesLectureIdSummaryRoute
+    }
   }
 }
 
@@ -328,15 +368,31 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface LecturesLectureIdSummaryRouteChildren {
+  LecturesLectureIdSummaryChatThreadIdRoute: typeof LecturesLectureIdSummaryChatThreadIdRoute
+}
+
+const LecturesLectureIdSummaryRouteChildren: LecturesLectureIdSummaryRouteChildren =
+  {
+    LecturesLectureIdSummaryChatThreadIdRoute:
+      LecturesLectureIdSummaryChatThreadIdRoute,
+  }
+
+const LecturesLectureIdSummaryRouteWithChildren =
+  LecturesLectureIdSummaryRoute._addFileChildren(
+    LecturesLectureIdSummaryRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ProgressRoute: ProgressRoute,
+  ApiChatRoute: ApiChatRoute,
   AssessAssessmentIdRoute: AssessAssessmentIdRoute,
   CoursesCourseIdRoute: CoursesCourseIdRoute,
   CoursesIndexRoute: CoursesIndexRoute,
-  LecturesLectureIdSummaryRoute: LecturesLectureIdSummaryRoute,
+  LecturesLectureIdSummaryRoute: LecturesLectureIdSummaryRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
