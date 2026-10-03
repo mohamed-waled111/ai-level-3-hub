@@ -46,7 +46,7 @@ export const Route = createFileRoute("/api/chat")({
 
         const { data: thread, error: threadError } = await supabase
           .from("summary_chat_threads")
-          .select("id, title, lecture_id, lectures(number, title, courses(code, title)), summaries:lectures(summaries(id, published))")
+          .select("id, title, lecture_id, lectures(number, title, courses(code, title))")
           .eq("id", parsed.data.threadId)
           .eq("user_id", authData.user.id)
           .maybeSingle();
@@ -72,23 +72,39 @@ export const Route = createFileRoute("/api/chat")({
           return Response.json({ message: "This summary has no readable material yet." }, { status: 400 });
         }
 
-        const signedFiles = await Promise.all((files ?? []).map(async (file) => {
-          const { data, error } = await supabase.storage.from("summary-files").createSignedUrl(file.storage_path, 3600);
-          if (error) throw error;
-          return { ...file, url: data.signedUrl };
-        })).catch((error: unknown) => error);
-        if (signedFiles instanceof Error) return Response.json({ message: signedFiles.message }, { status: 500 });
+        let signedFiles: Array<{ url: string; file_type: string; original_file_name: string }>;
+        try {
+          signedFiles = await Promise.all((files ?? []).map(async (file) => {
+            const { data, error } = await supabase.storage.from("summary-files").createSignedUrl(file.storage_path, 3600);
+            if (error) throw error;
+            return { ...file, url: data.signedUrl };
+          }));
+        } catch {
+          return Response.json({ message: "The summary files could not be opened right now." }, { status: 500 });
+        }
 
-        const userMessages = parsed.data.messages.filter((message) => message.role === "user");
-        const latestUser = userMessages.at(-1);
-        if (!latestUser) return Response.json({ message: "Ask a question to continue." }, { status: 400 });
+        const latestUser = parsed.data.messages.at(-1);
+        const question = latestUser?.parts?.filter((part) => part.type === "text").map((part) => part.text).join(" ").trim();
+        if (latestUser?.role !== "user" || !question || question.length > 4000) {
+          return Response.json({ message: "Enter a question of 4,000 characters or fewer." }, { status: 400 });
+        }
+
+        const { data: history, error: historyError } = await supabase.from("summary_chat_messages")
+          .select("sdk_message_id, role, parts")
+          .eq("thread_id", thread.id)
+          .order("created_at", { ascending: true });
+        if (historyError) return Response.json({ message: historyError.message }, { status: 500 });
+        const originalMessages: UIMessage[] = [
+          ...(history ?? []).map((item) => ({ id: item.sdk_message_id, role: item.role as "user" | "assistant", parts: item.parts as UIMessage["parts"] })),
+          { id: latestUser.id, role: "user", parts: [{ type: "text", text: question }] },
+        ];
 
         const { error: saveUserError } = await supabase.from("summary_chat_messages").upsert({
           thread_id: thread.id,
           user_id: authData.user.id,
           sdk_message_id: latestUser.id,
           role: "user",
-          parts: latestUser.parts as unknown as Json,
+          parts: [{ type: "text", text: question }] as Json,
         }, { onConflict: "thread_id,sdk_message_id", ignoreDuplicates: true });
         if (saveUserError) return Response.json({ message: saveUserError.message }, { status: 500 });
 
@@ -100,14 +116,14 @@ export const Route = createFileRoute("/api/chat")({
             ...signedFiles.map((file) => ({
               type: "file" as const,
               data: new URL(file.url),
-              mediaType: file.file_type === "pdf" ? "application/pdf" : "image/*",
+              mediaType: file.file_type === "pdf" ? "application/pdf" : file.original_file_name.toLowerCase().endsWith(".png") ? "image/png" : file.original_file_name.toLowerCase().endsWith(".webp") ? "image/webp" : "image/jpeg",
               filename: file.original_file_name,
             })),
             { type: "text" as const, text: "The files above are the complete selected lecture summary." },
           ],
         }];
 
-        const modelMessages = await convertToModelMessages(parsed.data.messages);
+        const modelMessages = await convertToModelMessages(originalMessages);
         const runIdFetch = createGatewayRunIdFetch(request.headers.get("X-Lovable-AIG-Run-ID") ?? undefined);
         const openai = createOpenAI({
           baseURL: "https://ai.gateway.lovable.dev/v1",
@@ -136,7 +152,7 @@ export const Route = createFileRoute("/api/chat")({
         });
 
         const response = result.toUIMessageStreamResponse({
-          originalMessages: parsed.data.messages,
+          originalMessages,
           sendReasoning: true,
           onError: safeErrorMessage,
           onFinish: async ({ responseMessage, isAborted }) => {
@@ -150,13 +166,8 @@ export const Route = createFileRoute("/api/chat")({
             }, { onConflict: "thread_id,sdk_message_id", ignoreDuplicates: true });
             if (error) throw error;
 
-            const firstQuestion = latestUser.parts
-              .filter((part) => part.type === "text")
-              .map((part) => part.text)
-              .join(" ")
-              .trim();
-            const title = thread.title === "New conversation" && firstQuestion
-              ? firstQuestion.slice(0, 64)
+            const title = thread.title === "New conversation" && question
+              ? question.slice(0, 64)
               : thread.title;
             const { error: updateError } = await supabase
               .from("summary_chat_threads")

@@ -28,6 +28,12 @@ export const Route = createFileRoute("/lectures/$lectureId/summary/chat/$threadI
 });
 
 type Thread = { id: string; title: string; updated_at: string };
+type ChatData = {
+  lecture: { id: string; number: number; title: string; courses: { id: string; code: string; title: string } };
+  active: { id: string; title: string };
+  threads: Thread[];
+  messages: UIMessage[];
+};
 
 function SummaryChatPage() {
   const { lectureId, threadId } = Route.useParams();
@@ -72,14 +78,14 @@ function SummaryChatPage() {
     return <AppShell><Container className="py-16"><EmptyState title="Conversation unavailable" description={error instanceof Error ? error.message : "This conversation or published summary could not be found."} /></Container></AppShell>;
   }
 
-  return <ChatWorkspace key={threadId} lectureId={lectureId} threadId={threadId} userId={user.id} data={data} onChanged={() => queryClient.invalidateQueries({ queryKey: ["summary-chat", lectureId] })} />;
+  return <ChatWorkspace key={threadId} lectureId={lectureId} threadId={threadId} userId={user.id} data={{ ...data, lecture: data.lecture, active: data.active }} onChanged={() => { void queryClient.invalidateQueries({ queryKey: ["summary-chat", lectureId] }); }} />;
 }
 
 function ChatWorkspace({ lectureId, threadId, userId, data, onChanged }: {
   lectureId: string;
   threadId: string;
   userId: string;
-  data: NonNullable<ReturnType<typeof useQuery>["data"]> & { lecture: { id: string; number: number; title: string; courses: { id: string; code: string; title: string } }; threads: Thread[]; messages: UIMessage[] };
+  data: ChatData;
   onChanged: () => void;
 }) {
   const navigate = useNavigate();
@@ -107,19 +113,19 @@ function ChatWorkspace({ lectureId, threadId, userId, data, onChanged }: {
 
   async function createThread() {
     const { data: created, error: createError } = await supabase.from("summary_chat_threads").insert({ lecture_id: lectureId, user_id: userId }).select("id").single();
-    if (createError) return toast.error(createError.message);
-    navigate({ to: "/lectures/$lectureId/summary/chat/$threadId", params: { lectureId, threadId: created.id } });
+    if (createError) { toast.error(createError.message); return; }
+    void navigate({ to: "/lectures/$lectureId/summary/chat/$threadId", params: { lectureId, threadId: created.id } });
   }
 
   async function removeThread(id: string) {
     const { error: removeError } = await supabase.from("summary_chat_threads").delete().eq("id", id);
-    if (removeError) return toast.error(removeError.message);
+    if (removeError) { toast.error(removeError.message); return; }
     const next = data.threads.find((thread) => thread.id !== id);
-    if (next) navigate({ to: "/lectures/$lectureId/summary/chat/$threadId", params: { lectureId, threadId: next.id } });
+    if (next) void navigate({ to: "/lectures/$lectureId/summary/chat/$threadId", params: { lectureId, threadId: next.id } });
     else {
       const { data: created, error: createError } = await supabase.from("summary_chat_threads").insert({ lecture_id: lectureId, user_id: userId }).select("id").single();
-      if (createError) return toast.error(createError.message);
-      navigate({ to: "/lectures/$lectureId/summary/chat/$threadId", params: { lectureId, threadId: created.id } });
+      if (createError) { toast.error(createError.message); return; }
+      void navigate({ to: "/lectures/$lectureId/summary/chat/$threadId", params: { lectureId, threadId: created.id } });
     }
   }
 
@@ -140,7 +146,7 @@ function ChatWorkspace({ lectureId, threadId, userId, data, onChanged }: {
               {data.threads.map((thread) => (
                 <div key={thread.id} className={`flex min-w-56 items-center rounded-md border ${thread.id === threadId ? "border-primary bg-card" : "border-transparent"}`}>
                   <Link to="/lectures/$lectureId/summary/chat/$threadId" params={{ lectureId, threadId: thread.id }} className="min-w-0 flex-1 px-3 py-2 text-left text-sm font-medium"><span className="block truncate">{thread.title}</span></Link>
-                  <Button variant="ghost" size="icon-sm" aria-label={`Delete ${thread.title}`} onClick={() => removeThread(thread.id)}><Trash2 className="size-3.5" /></Button>
+                  <Button variant="ghost" size="icon" aria-label={`Delete ${thread.title}`} onClick={() => void removeThread(thread.id)}><Trash2 className="size-3.5" /></Button>
                 </div>
               ))}
             </div>
